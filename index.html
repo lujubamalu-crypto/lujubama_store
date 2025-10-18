@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUJUBAMA - Fashion Clothing</title>
+    <style>
+        /* --- ESTILOS GENERALES Y AUTENTICACIÓN --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* NUEVO: Contenedor y estilos para la foto de perfil en el login */
+        .login-layout {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            max-width: 900px;
+            width: 100%;
+            background: #000;
+            padding: 20px;
+        }
+
+        .login-image-side {
+            display: block; /* Visible en pantallas grandes */
+            flex: 1;
+            text-align: center;
+        }
+        .login-image-side img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            object-fit: cover;
+            border: 2px solid #ffffff;
+            /* Estilo para que parezca una foto de perfil/producto grande */
+        }
+
+        @media (max-width: 768px) {
+            .login-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .login-image-side {
+                display: none; /* Ocultar la imagen en móviles si lo prefieres */
+            }
+        }
+        .container {
+            width: 100%;
+            max-width: 450px; /* Reducido para hacer espacio a la imagen */
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 40px;
+        }
+        .logo h1 {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+        .logo p {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #cccccc;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            text-align: left;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 14px 15px;
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            color: #ffffff;
+            font-size: 14px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        /* Nuevo: Estilos para el campo de contraseña con toggle */
+        .password-container {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            cursor: pointer;
+            color: #cccccc;
+            font-size: 18px;
+        }
+        /* Fin Nuevo */
+
+        .forgot-password, .toggle-text {
+            text-align: right;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 0;
+            color: #cccccc;
+        }
+        .forgot-password a, .toggle-text a {
+            color: #ffffff;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .forgot-password a:hover, .toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Estilos para mensajes de error/éxito */
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #0d300d;
+            border: 1px solid #90EE90;
+            color: #90EE90;
+            display: block;
+        }
+
+        .message.error {
+            background: #300d0d;
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            display: block;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+        /* --- ESTILOS DEL DASHBOARD Y PRODUCTOS --- */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            padding: 0 30px 40px;
+        }
+        .dashboard.active {
+            display: block;
+        }
+        .dashboard-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 40px 0 20px;
+            border-bottom: 1px solid #333333;
+            position: sticky;
+            top: 0;
+            background: #000000;
+            z-index: 10;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Foto de perfil en el header */
+        .header-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffffff;
+            cursor: pointer;
+        }
+
+        /* Estilos del carrito y búsqueda */
+        .cart-btn {
+            background: #1a1a1a;
+            border: 1px solid #555;
+            margin: 0;
+            width: auto;
+            padding: 10px 15px;
+        }
+
+        .cart-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .logout-btn {
+            background: #300d0d;
+            border-color: #ff4d4d;
+            margin: 0;
+            width: auto;
+            padding: 10px 15px;
+        }
+
+        .logout-btn:hover {
+            background: #ff4d4d;
+            color: #000;
+        }
+
+        .search-container input {
+            padding: 12px 15px;
+            background: #1a1a1a;
+            border: 1px solid #333333;
+            color: #ffffff;
+            font-size: 16px;
+            border-radius: 2px;
+            width: 100%;
+        }
+        .dashboard-nav {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .dashboard-nav a {
+            text-decoration: none;
+            color: #cccccc;
+            padding: 5px 10px;
+            transition: color 0.3s;
+        }
+
+        .dashboard-nav a:hover,
+        .dashboard-nav a.active-nav {
+            color: #ffffff;
+            border-bottom: 2px solid #ffffff;
+        }
+
+        .dashboard-content-section {
+            display: none;
+        }
+
+        .dashboard-content-section.active {
+            display: block;
+        }
+        /* --- PRODUCTOS CON IMÁGENES --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding-bottom: 50px;
+        }
+
+        .product-card {
+            border: 1px solid #333333;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-card:hover {
+            border-color: #ffffff;
+            background: #1a1a1a;
+        }
+        /* Estilo para la imagen del producto */
+        .product-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 1px solid #333333;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #90EE90; /* Verde claro para el precio */
+        }
+
+        .add-to-cart-btn {
+            margin-top: 15px;
+            background: #90EE90;
+            color: #000;
+            border-color: #90EE90;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+        /* --- VISTA AJUSTES/PERFIL --- */
+        .settings-list {
+            list-style: none;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .settings-list li {
+            border-bottom: 1px solid #333333;
+        }
+        .settings-list a {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .settings-list a:hover {
+            background: #1a1a1a;
+        }
+
+        /* Estilos del Perfil de Usuario */
+        #profileView {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .profile-pic-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            margin-bottom: 20px;
+        }
+        /* --- VISTA DE PUBLICIDAD (BANNERS) --- */
+        .ad-section {
+            margin-top: 40px;
+            margin-bottom: 50px;
+            border-top: 1px solid #333333;
+            padding-top: 30px;
+        }
+
+        .ad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .ad-banner {
+            width: 100%;
+            height: 150px; /* Altura fija para banners */
+            overflow: hidden;
+            border: 1px solid #333333;
+            display: block;
+        }
+        .ad-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .ad-banner img:hover {
+            transform: scale(1.05);
+        }
+        /* --- VISTA DEL CARRITO --- */
+        #cartView {
+            display: none;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        #cartView.active {
+            display: block;
+        }
+
+        .cart-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px dashed #333333;
+        }
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            text-align: left;
+        }
+        .cart-item-info img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .item-actions input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            margin: 0;
+            background: #1a1a1a;
+            border: 1px solid #333;
+        }
+
+        .cart-summary {
+            margin-top: 20px;
+            border-top: 2px solid #555;
+            padding-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .checkout-button {
+            background: #90EE90;
+            color: #000;
+            border-color: #90EE90;
+        }
+
+        .checkout-button:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .back-to-shop-btn {
+            background: #333;
+            border-color: #555;
+            margin-top: 10px;
+        }
+        /* --- ESTILOS DE CHECKOUT Y FOOTER --- */
+        .checkout-view {
+            display: none;
+        }
+        .checkout-view.active {
+            display: block;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: left;
+        }
+
+        .payment-info {
+            background: #1a1a1a;
+            padding: 20px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .payment-info h3 {
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .payment-info strong {
+            color: #90EE90;
+            display: block;
+            margin: 10px 0;
+            font-size: 24px !important;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #333333;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #888888;
+            text-transform: uppercase;
+        }
+        
+        /* --- ADICIÓN SUPERVISOR: ESTILOS PARA LA VISTA DE ADMINISTRADOR --- */
+        .admin-view-container {
+            padding: 30px 0;
+        }
+        .admin-view-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 50px;
+            font-size: 14px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #0c0c0c;
+        }
+        .data-table tr:hover {
+            background-color: #222222;
+        }
+        .purchase-items-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #cccccc;
+        }
+        .purchase-items-list li {
+            margin-bottom: 3px;
+        }
+        /* --- FIN ADICIÓN SUPERVISOR --- */
+    </style>
+</head>
+<body>
+    <div id="authSection" class="auth-container">
+        <div class="login-layout">
+            <div class="login-image-side">
+                <img src="https://i.pinimg.com/736x/3c/c7/3c/3cc73c8ef4247657dbb2b89f4995fa42.jpg" alt="Imagen Promocional de la Tienda">
+            </div>
+            <div class="container">
+                <div class="logo">
+                    <h1>LUJUBAMA</h1>
+                    <p>FASHION CLOTHING</p>
+                </div>
+                <div class="form-container active" id="loginForm">
+                    <h2>Iniciar Sesión</h2>
+                    <div class="message" id="loginMsg"></div>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group"><label>Usuario</label><input type="text" id="loginUser" required placeholder="Tu usuario"></div>
+                        <div class="form-group password-container"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="Tu contraseña"><span class="toggle-password" onclick="togglePasswordVisibility('loginPassword')"> 👁 ️</span></div>
+                        <div class="forgot-password"><a onclick="showRecovery()">¿Se te olvidó la contraseña?</a></div>
+                        <button type="submit">Entrar</button>
+                    </form>
+                    <div class="toggle-text">¿No tienes cuenta? <a onclick="switchForm('register')">Regístrate</a></div>
+                </div>
+                <div class="form-container" id="registerForm">
+                    <h2>Crear Cuenta</h2>
+                    <div class="message" id="registerMsg"></div>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-group"><label>Usuario</label><input type="text" id="registerUser" required placeholder="Crea tu usuario"></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="registerEmail" required placeholder="Tu email"></div>
+                        <div class="form-group password-container"><label>Contraseña</label><input type="password" id="registerPassword" required placeholder="Crea una contraseña"><span class="toggle-password" onclick="togglePasswordVisibility('registerPassword')"> 👁 ️</span></div>
+                        <div class="form-group password-container"><label>Repetir Contraseña</label><input type="password" id="registerPassword2" required placeholder="Repite la contraseña"><span class="toggle-password" onclick="togglePasswordVisibility('registerPassword2')"> 👁 ️</span></div>
+                        <button type="submit">Registrarme</button>
+                    </form>
+                    <div class="toggle-text">¿Ya tienes cuenta? <a onclick="switchForm('login')">Inicia sesión</a></div>
+                </div>
+                <div class="form-container" id="recoveryForm">
+                    <h2>Recuperar Contraseña</h2>
+                    <div class="message" id="recoveryMsg"></div>
+                    <form onsubmit="handleRecovery(event)">
+                        <div class="form-group"><label>Email</label><input type="email" id="recoveryEmail" required placeholder="Tu email registrado"></div>
+                        <button type="submit">Enviar Enlace</button>
+                    </form>
+                    <div class="toggle-text">Volver a <a onclick="switchForm('login')">Inicia Sesión</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboardSection">
+        <div class="dashboard-header">
+            <div class="header-top">
+                <div class="welcome-text">
+                    <h1>Bienvenido, <span id="usernameDash"></span></h1>
+                    <p>Explora nuestras colecciones exclusivas</p>
+                </div>
+                <div class="header-actions">
+                    <img id="headerProfilePic" class="header-profile-pic" src="" alt="Perfil" onclick="changeDashboardView(null, 'profileView')">
+                    <button class="cart-btn" onclick="showCart()">
+                        🛒  Carrito (<span id="cartCount">0</span>)
+                    </button>
+                    <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder=" 🔍  Buscar productos..." onkeyup="filterProducts()">
+            </div>
+            <div class="dashboard-nav">
+                <a href="#" class="nav-link active-nav" data-target="homeView" onclick="changeDashboardView(event, 'homeView')">Inicio</a>
+                <a href="#" class="nav-link" data-target="categoriesView" onclick="changeDashboardView(event, 'categoriesView')">Categorías</a>
+                <a href="#" class="nav-link" data-target="settingsView" onclick="changeDashboardView(event, 'settingsView')">Ajustes</a>
+                <a href="#" class="nav-link admin-link" data-target="adminView" onclick="changeDashboardView(event, 'adminView')" style="display: none;">Admin</a>
+                </div>
+        </div>
+        <div class="dashboard-body">
+            <div class="dashboard-content-section active" id="homeView">
+                <h2 style="margin-bottom: 20px; text-align: center;">Últimos Lanzamientos</h2>
+                <div class="product-grid" id="homeProductGrid">
+                </div>
+                <div class="ad-section">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Publicidad Destacada</h2>
+                    <div class="ad-grid" id="adBannersContainer">
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-content-section" id="categoriesView">
+                <h2 style="margin-bottom: 20px; text-align: center;">Explora por Categoría</h2>
+                <div class="product-grid" id="categoryProductGrid">
+                </div>
+            </div>
+            <div class="dashboard-content-section" id="settingsView">
+                <h2 style="margin-bottom: 20px; text-align: center;">Configuración y Soporte</h2>
+                <ul class="settings-list">
+                    <li>
+                        <a href="#" data-target="profileView" onclick="changeDashboardView(event, 'profileView')">
+                            👤  Mi Perfil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://i.pinimg.com/1200x/fc/ae/b3/fcaeb33b122b22a4cac47d29f4447684.jpg" target="_blank">
+                            📞  Centro de Ayuda (WhatsApp)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="alert('Funcionalidad de Órdenes en desarrollo')">
+                            📦  Mis Órdenes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="dashboard-content-section" id="adminView">
+                <div class="admin-view-container">
+                    <h2 style="color: #90EE90;">Vista de Supervisor</h2>
+                    <h3 style="margin-bottom: 15px;">Usuarios Registrados (<span id="userCount">0</span>)</h3>
+                    <table class="data-table" id="usersTable">
+                        </table>
+
+                    <h3 style="margin-bottom: 15px; margin-top: 30px;">Historial de Pedidos (<span id="orderCount">0</span>)</h3>
+                    <table class="data-table" id="ordersTable">
+                        </table>
+                </div>
+            </div>
+            <div class="dashboard-content-section" id="profileView">
+                <h2 style="margin-bottom: 40px;">Mi Perfil de Usuario</h2>
+                <img id="profilePreview" class="profile-pic-preview" src="" alt="Foto de Perfil">
+                <div class="message" id="profileMsg"></div>
+                <form onsubmit="updateProfile(event)">
+                    <div class="form-group">
+                        <label for="profilePicURL">URL de la Foto de Perfil ("Muñeco")</label>
+                        <input type="text" id="profilePicURL" placeholder="Pega aquí la URL de tu imagen (ej: https://i.pinimg.com/73x/fe/84/de/fe84def558bc38c4ef0c6af452be5fa4.jpg)">
+                    </div>
+                    <button type="submit">Guardar Foto de Perfil</button>
+                </form>
+            </div>
+        </div>
+        <div class="app-footer">
+            S.A.S LUJUBAMA 2025 ADEMÁS DE TU TIENDA DE ROPA TU TIENDA TOTAL
+        </div>
+    </div>
+
+    <div id="cartView">
+        <h2> 🛒  Tu Carrito de Compras</h2>
+        <div class="message" id="cartMsg"></div>
+        <ul class="cart-list" id="cartItemsList">
+        </ul>
+        <div class="cart-summary">
+            <span>TOTAL:</span>
+            <span id="cartTotalDisplay">$0.00</span>
+        </div>
+        <button class="checkout-button" onclick="showCheckout()">Proceder al Pago</button>
+        <button class="back-to-shop-btn" onclick="showDashboard(usuarioActual)">Seguir Comprando</button>
+    </div>
+    <div class="checkout-view" id="checkoutView">
+        <h2>Finalizar Compra</h2>
+        <div class="message" id="checkoutMsg"></div>
+
+        <div class="payment-info">
+            <h3>Método de Pago: Nequi</h3>
+            <p>Por favor, realiza una transferencia por el valor de *$<span id="checkoutTotal">0.00</span>* al siguiente número de Nequi:</p>
+            <p style="font-size: 18px;"><strong>322 237 0894</strong></p>
+            <p>Una vez completado el pago, rellena el siguiente formulario con tu dirección para el envío.</p>
+        </div>
+
+        <form onsubmit="handleCheckout(event)">
+            <div class="form-group"><label>Dirección de Envío</label><input type="text" id="shippingAddress" required placeholder="Ej: Calle 10 # 5-43, Bogotá"></div>
+            <div class="form-group"><label>Ciudad</label><input type="text" id="shippingCity" required placeholder="Tu ciudad"></div>
+            <div class="form-group"><label>Teléfono de Contacto</label><input type="number" id="shippingPhone" required placeholder="Tu número de teléfono"></div>
+            <button type="submit">Confirmar Pedido y Envío</button>
+            <button type="button" class="back-to-shop-btn" onclick="showCart()">Volver al Carrito</button>
+        </form>
+    </div>
+    <script>
+        // --- DATA DE LA APLICACIÓN (Simulación) ---
+        const DEFAULT_PROFILE_PIC = 'https://i.pinimg.com/73x/f4/5c/b4/f45cb4a7c4e4cad197ff53c62f34a5a4.jpg'; // URL de un "muñeco" genérico
+        const NEQUI_NUMBER = '3222370894';
+
+        let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+        
+        // ADICIÓN SUPERVISOR: Inicialización de cuenta y pedidos
+        const supervisorUser = 'SupervisorLU';
+        const supervisorEmail = 'salamalenco18@gmail.com';
+        const supervisorPass = '1076653919Lu';
+
+        let supervisorIndex = usuarios.findIndex(u => u.email === supervisorEmail);
+
+        if (supervisorIndex === -1) {
+            // Si el supervisor NO existe, lo creamos
+            usuarios.push({
+                usuario: supervisorUser,
+                email: supervisorEmail,
+                password: supervisorPass,
+                role: 'supervisor', // Rol asignado
+                profilePicURL: DEFAULT_PROFILE_PIC
+            });
+        } else {
+            // *** CORRECCIÓN MÁS FUERTE AQUÍ ***
+            // Si el supervisor EXISTE, garantizamos que su rol sea 'supervisor'
+            if (usuarios[supervisorIndex].role !== 'supervisor' || usuarios[supervisorIndex].usuario !== supervisorUser || usuarios[supervisorIndex].password !== supervisorPass) {
+                usuarios[supervisorIndex].role = 'supervisor';
+                usuarios[supervisorIndex].usuario = supervisorUser; // Asegurar el nombre de usuario
+                usuarios[supervisorIndex].password = supervisorPass; // Asegurar la contraseña
+            }
+        }
+        
+        // Guardar la lista de usuarios actualizada (ya sea que se creó o se corrigió el supervisor)
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+
+        // 2. Inicializar array de pedidos completados
+        let pedidosCompletados = JSON.parse(localStorage.getItem('pedidosCompletados')) || [];
+        // FIN ADICIÓN SUPERVISOR
+        
+        // Asegurar que cada usuario tiene un profilePicURL
+        usuarios = usuarios.map(u => ({
+            ...u,
+            profilePicURL: u.profilePicURL || DEFAULT_PROFILE_PIC
+        }));
+
+        let usuarioActual = null;
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        // Catálogo de productos con URL de imagen
+        const products = [
+            { id: 'tshirt1', name: 'Camiseta Lujo Negro x xs l', imageURL: 'https://i.pinimg.com/736x/f7/bd/cf/f7bdcf8c305ded73ec7a47a6077171f8.jpg', description: 'Algodón orgánico, corte slim.', price: 50.00, keywords: 'camiseta negro algodon lujo', category: 'hombre' },
+            { id: 'pants1', name: 'Pantalon Elegante Gris l m', imageURL: 'https://i.pinimg.com/736x/d7/68/b0/d768b07344a60fecb9836b256d29f8a5.jpg', description: 'Corte recto, tela elástica.', price: 95.00, keywords: 'pantalon gris elegante recto', category: 'mujer' },
+            { id: 'jacket1', name: 'Chaqueta Piel s m', imageURL: 'https://i.pinimg.com/1200x/5b/15/10/5b15107024dabc506a55b25a0a542dba.jpg', description: 'Cuero vegano, cremallera metálica.', price: 180.00, keywords: 'chaqueta piel cuero edicion', category: 'hombre' },
+            { id: 'dress1', name: 'Vestido Noche Rojoxs l m ', imageURL: 'https://i.pinimg.com/1200x/b9/d3/a4/b9d3a4b279538c602d35a51170bba137.jpg', description: 'Seda, espalda descubierta.', price: 120.00, keywords: 'vestido noche rojo seda', category: 'mujer' },
+            { id: 'tshirt2', name: 'Camiseta Esencial Blanco x xs l m ', imageURL: 'https://i.pinimg.com/1200x/08/dc/bc/08dcbca6966fb89e9186550b818a47eb.jpg', description: 'Básico para tu armario.', price: 40.00, keywords: 'camiseta blanco basico', category: 'niño' },
+            { id: 'pants2', name: 'Jeans Azul Clásico s xs', imageURL: 'https://picsum.photos/id/60/400/300', description: 'Denim, ajuste regular.', price: 75.00, keywords: 'jeans azul clasico denim', category: 'mujer' },
+            { id: 'skirt1', name: 'Falda Plisada talla unica', imageURL: 'https://i.pinimg.com/736x/c1/cd/d5/c1cdd5a7d189b1cf864e335d3cef046f.jpg', description: 'Para la escuela o el paseo.', price: 35.00, keywords: 'falda plisada escuela', category: 'niña' },
+            { id: 'hoodie1', name: 'Hoodie Deportivo s xs l xl m', imageURL: 'https://i.pinimg.com/736x/6d/dc/53/6ddc53e970e056185becd30c833a5dfe.jpg', description: 'Cómodo y abrigado para el frío.', price: 60.00, keywords: 'hoodie deportivo abrigo', category: 'niño' },
+            { id: 'blouse1', name: 'Blusa Formal Seda s', imageURL: 'https://i.pinimg.com/736x/ab/80/85/ab8085e5907001d497454fa4e558d540.jpg', description: 'Perfecta para la oficina.', price: 85.00, keywords: 'blusa formal oficina', category: 'mujer' },
+            { id: 'suit1', name: 'Traje de Gala l m', imageURL: 'https://i.pinimg.com/736x/1a/89/96/1a899691e38f1068216468b62a4518e9.jpg', description: 'Elegancia para eventos especiales.', price: 300.00, keywords: 'traje gala formal', category: 'hombre' },
+        ];
+
+        // URLs para los Banners de Publicidad
+        const adBanners = [
+            'https://i.pinimg.com/736x/44/40/6a/44406a425020afc8176686aa78dc8a03.jpg',
+            'https://i.pinimg.com/736x/b0/26/58/b02658a9a1ac84ce038214078af6a6d5.jpg',
+            'https://i.pinimg.com/736x/9e/4b/5f/9e4b5ffa0ca7ea15bd13bdc53116068f.jpg',
+            'https://i.pinimg.com/736x/90/95/79/90957982da68db248bcd784f4a5a6abe.jpg'
+        ];
+        // --- FUNCIONES DE UTILIDAD (Mensajes y Contraseña) ---
+        function clearMessages() {
+            document.querySelectorAll('.message').forEach(el => el.classList.remove('success', 'error'));
+            document.querySelectorAll('.message').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.message').forEach(el => el.textContent = '');
+        }
+        function showMessage(id, message, isError = false) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = message;
+                el.classList.add(isError ? 'error' : 'success');
+                el.style.display = 'block';
+                setTimeout(() => el.style.display = 'none', isError ? 5000 : 3000);
+            }
+        }
+
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+        // --- FUNCIONES DE VISTAS PRINCIPALES Y AUTENTICACIÓN ---
+        function switchForm(form) {
+            document.querySelectorAll('.form-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(form + 'Form').classList.add('active');
+            clearMessages();
+        }
+
+        function showRecovery() {
+            switchForm('recovery');
+        }
+        function showDashboard(username) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('cartView').classList.remove('active');
+            document.getElementById('checkoutView').classList.remove('active');
+            document.getElementById('dashboardSection').classList.add('active');
+            document.getElementById('usernameDash').textContent = username;
+
+            usuarioActual = username;
+
+            // Cargar y mostrar la foto de perfil del usuario
+            const user = usuarios.find(u => u.usuario === username);
+            const picURL = user ? user.profilePicURL : DEFAULT_PROFILE_PIC;
+
+            document.getElementById('headerProfilePic').src = picURL;
+            document.getElementById('profilePreview').src = picURL;
+            document.getElementById('profilePicURL').value = user.profilePicURL === DEFAULT_PROFILE_PIC ? '' : user.profilePicURL;
+            // Aseguramos que la vista inicial sea 'homeView'
+            changeDashboardView(null, 'homeView');
+
+            // ADICIÓN SUPERVISOR: Control de visibilidad del link de Admin
+            const adminLink = document.querySelector('.admin-link');
+            if (user && user.role === 'supervisor') {
+                adminLink.style.display = 'block';
+            } else {
+                adminLink.style.display = 'none';
+            }
+            // FIN ADICIÓN SUPERVISOR
+
+            updateCartCount();
+        }
+        function logout() {
+            document.getElementById('authSection').style.display = 'flex';
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('cartView').classList.remove('active');
+            document.getElementById('checkoutView').classList.remove('active');
+            usuarioActual = null;
+            switchForm('login');
+        }
+        function handleLogin(event) {
+            event.preventDefault(); clearMessages();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            if (!user || !pass) { showMessage('loginMsg', 'Por favor completa todos los campos', true); return; }
+
+            const found = usuarios.find(u => u.usuario === user && u.password === pass);
+            if (found) {
+                // Inicializar el profilePic si es la primera vez que entra después de la actualización
+                if (!found.profilePicURL) {
+                    found.profilePicURL = DEFAULT_PROFILE_PIC;
+                }
+                
+                // El rol ya debe estar asignado gracias a la corrección al inicio del <script>
+                // Pero por si acaso, lo confirmamos aquí, aunque ya no es estrictamente necesario.
+                if (!found.role) {
+                    found.role = found.email === supervisorEmail ? 'supervisor' : 'user';
+                    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                }
+
+                showMessage('loginMsg', 'Bienvenido, entrando...');
+                setTimeout(() => showDashboard(found.usuario), 1000);
+            }
+            else { showMessage('loginMsg', 'Usuario o contraseña incorrectos', true); }
+        }
+        function handleRegister(event) {
+            event.preventDefault(); clearMessages();
+            const user = document.getElementById('registerUser').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const pass = document.getElementById('registerPassword').value.trim();
+            const pass2 = document.getElementById('registerPassword2').value.trim();
+
+            if (!user || !email || !pass || !pass2) { showMessage('registerMsg', 'Por favor completa todos los campos', true); return; }
+            if (pass !== pass2) { showMessage('registerMsg', 'Las contraseñas no coinciden', true); return; }
+            if (pass.length < 4) { showMessage('registerMsg', 'La contraseña debe tener al menos 4 caracteres', true); return; }
+
+            const exists = usuarios.some(u => u.usuario === user || u.email === email);
+            if (exists) { showMessage('registerMsg', 'El usuario o email ya está registrado', true); return; }
+
+            // Añadir el campo profilePicURL por defecto al registrar
+            // Se incluye el rol 'user' por defecto
+            usuarios.push({ usuario: user, email: email, password: pass, profilePicURL: DEFAULT_PROFILE_PIC, role: 'user' });
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            showMessage('registerMsg', 'Cuenta creada, inicia sesión');
+
+            document.getElementById('registerUser').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('registerPassword2').value = '';
+
+            setTimeout(() => switchForm('login'), 2000);
+        }
+
+        function handleRecovery(event) {
+            event.preventDefault(); clearMessages();
+            // Simulamos el proceso de recuperación de contraseña
+            const email = document.getElementById('recoveryEmail').value.trim();
+            if (!email) { showMessage('recoveryMsg', 'Por favor ingresa tu email', true); return; }
+
+            const exists = usuarios.some(u => u.email === email);
+            if (exists) {
+                showMessage('recoveryMsg', `Enlace de recuperación enviado a ${email}. Revisa tu bandeja.`, false);
+                document.getElementById('recoveryEmail').value = '';
+            } else {
+                showMessage('recoveryMsg', 'El email no está registrado.', true);
+            }
+        }
+        // --- FUNCIONES DE NAVEGACIÓN Y RENDERIZADO ---
+        function changeDashboardView(event, targetViewId) {
+            if (event) {
+                event.preventDefault();
+            }
+            document.querySelectorAll('.dashboard-content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active-nav'));
+            document.getElementById(targetViewId).classList.add('active');
+
+            if (targetViewId !== 'profileView' && targetViewId !== 'settingsView' && targetViewId !== 'categoriesView' && targetViewId !== 'adminView') {
+                // Activar el link de navegación solo si es una vista con link directo en el nav
+                const navLink = document.querySelector(`.nav-link[data-target="${targetViewId}"]`);
+                if(navLink) navLink.classList.add('active-nav');
+            } else if (targetViewId === 'profileView') {
+                // Para 'profileView', aseguramos que 'Ajustes' esté activo si viene desde allí
+                document.querySelector(`.nav-link[data-target="settingsView"]`).classList.add('active-nav');
+            } else if (targetViewId === 'adminView') {
+                 // Para 'adminView', activamos el link de Admin
+                document.querySelector(`.nav-link[data-target="adminView"]`).classList.add('active-nav');
+            }
+             else {
+                // Activar el link de la vista de donde venga
+                document.querySelector(`.nav-link[data-target="${targetViewId}"]`).classList.add('active-nav');
+            }
+            // 4. Lógicas específicas para cada vista
+            if (targetViewId === 'homeView') {
+                renderProducts(products, 'homeProductGrid');
+                renderAdBanners();
+            } else if (targetViewId === 'categoriesView') {
+                renderProducts(products, 'categoryProductGrid');
+            } else if (targetViewId === 'profileView') {
+                // Asegurar que los datos del perfil estén actualizados al entrar
+                const user = usuarios.find(u => u.usuario === usuarioActual);
+                document.getElementById('profilePreview').src = user.profilePicURL;
+                document.getElementById('profilePicURL').value = user.profilePicURL === DEFAULT_PROFILE_PIC ? '' : user.profilePicURL;
+                document.getElementById('profileMsg').style.display = 'none';
+            } 
+            // ADICIÓN SUPERVISOR: Renderizar la vista de administrador
+            else if (targetViewId === 'adminView') {
+                renderAdminView();
+            }
+            // FIN ADICIÓN SUPERVISOR
+
+            document.getElementById('searchInput').value = '';
+        }
+        function renderProducts(productsToDisplay, gridId) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+
+            if (productsToDisplay.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #888888; grid-column: 1 / -1;">No se encontraron productos en esta selección.</p>';
+                return;
+            }
+            productsToDisplay.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.imageURL}" alt="${product.name}" class="product-image">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p>Categoría: ${product.category.charAt(0).toUpperCase() + product.category.slice(1)}</p>
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <button class="add-to-cart-btn" onclick="addToCart('${product.id}')">Añadir al Carrito</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderAdBanners() {
+            const container = document.getElementById('adBannersContainer');
+            container.innerHTML = '';
+
+            adBanners.forEach((url, index) => {
+                const banner = document.createElement('a');
+                banner.href = '#';
+                banner.className = 'ad-banner';
+                banner.innerHTML = `<img src="${url}" alt="Publicidad ${index + 1}">`;
+                container.appendChild(banner);
+            });
+        }
+        
+        // ADICIÓN SUPERVISOR: FUNCIÓN PARA RENDERIZAR LA VISTA DE ADMINISTRADOR
+        function renderAdminView() {
+            const user = usuarios.find(u => u.usuario === usuarioActual);
+
+            // 1. Validar que el usuario sea supervisor
+            if (!user || user.role !== 'supervisor') {
+                document.getElementById('adminView').innerHTML = '<p style="text-align: center; color: #ff4d4d; padding: 50px;">Acceso Denegado. Solo Supervisores pueden ver esta información.</p>';
+                return;
+            }
+            
+            // 2. Renderizar Usuarios Registrados
+            const usersTable = document.getElementById('usersTable');
+            const registeredUsers = usuarios.filter(u => u.role !== 'supervisor'); // Excluir al supervisor de la lista de usuarios 'normales'
+            document.getElementById('userCount').textContent = registeredUsers.length;
+            
+            let userTableHTML = `
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            registeredUsers.forEach(u => {
+                userTableHTML += `
+                    <tr>
+                        <td>${u.usuario}</td>
+                        <td>${u.email}</td>
+                        <td>${u.role || 'user'}</td>
+                    </tr>
+                `;
+            });
+            userTableHTML += `</tbody>`;
+            usersTable.innerHTML = userTableHTML;
+
+            // 3. Renderizar Historial de Pedidos
+            const ordersTable = document.getElementById('ordersTable');
+            document.getElementById('orderCount').textContent = pedidosCompletados.length;
+            
+            let orderTableHTML = `
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Dirección/Teléfono</th>
+                        <th>Items Comprados</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            pedidosCompletados.forEach(order => {
+                const itemList = order.items.map(item => 
+                    `<li>${item.name} (${item.quantity} und.) - $${item.price.toFixed(2)} c/u</li>`
+                ).join('');
+                
+                orderTableHTML += `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${order.date}</td>
+                        <td>${order.user}</td>
+                        <td>${order.address}, ${order.city} / ${order.phone}</td>
+                        <td><ul class="purchase-items-list">${itemList}</ul></td>
+                        <td style="color: #90EE90; font-weight: bold;">$${order.total.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            orderTableHTML += `</tbody>`;
+            ordersTable.innerHTML = orderTableHTML;
+        }
+        // FIN ADICIÓN SUPERVISOR
+
+        // --- FUNCIÓN DE BÚSQUEDA ---
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Usamos la vista activa para saber dónde renderizar
+            const activeView = document.querySelector('.dashboard-content-section.active');
+            let gridId = 'homeProductGrid';
+            let targetProducts = products;
+
+            if (activeView && activeView.id === 'categoriesView') {
+                gridId = 'categoryProductGrid';
+            } else if (activeView && activeView.id !== 'homeView') {
+                // Si la búsqueda se hace en otra vista, volvemos a Home
+                changeDashboardView(null, 'homeView');
+                gridId = 'homeProductGrid';
+            }
+            const filteredProducts = targetProducts.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.keywords.toLowerCase().includes(query) ||
+                p.description.toLowerCase().includes(query) ||
+                p.category.toLowerCase().includes(query)
+            );
+            renderProducts(filteredProducts, gridId);
+        }
+        // --- LÓGICA DE PERFIL (Foto de "Muñeco") ---
+        function updateProfile(event) {
+            event.preventDefault();
+            clearMessages();
+            const newURL = document.getElementById('profilePicURL').value.trim();
+            const userIndex = usuarios.findIndex(u => u.usuario === usuarioActual);
+
+            let finalURL = newURL || DEFAULT_PROFILE_PIC;
+
+            if (userIndex > -1) {
+                usuarios[userIndex].profilePicURL = finalURL;
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+                // Actualizar la vista previa y el header
+                document.getElementById('headerProfilePic').src = finalURL;
+                document.getElementById('profilePreview').src = finalURL;
+                document.getElementById('profilePicURL').value = newURL; // Mantener la URL sin el default
+                showMessage('profileMsg', 'Foto de perfil actualizada con éxito.', false);
+
+            } else {
+                showMessage('profileMsg', 'Error al encontrar el usuario.', true);
+            }
+        }
+
+        // --- LÓGICA DEL CARRITO Y CHECKOUT ---
+
+        function saveCart() {
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            updateCartCount();
+            renderCart();
+        }
+        function updateCartCount() {
+            const count = carrito.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existingItem = carrito.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                carrito.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    imageURL: product.imageURL,
+                    quantity: 1
+                });
+            }
+            saveCart();
+            showMessage('loginMsg', `"${product.name}" añadido al carrito!`, false);
+        }
+        function changeQuantity(productId, delta) {
+            const item = carrito.find(i => i.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeItem(productId);
+                } else {
+                    saveCart();
+                }
+            }
+        }
+        function removeItem(productId) {
+            carrito = carrito.filter(item => item.id !== productId);
+            saveCart();
+        }
+        function renderCart() {
+            const list = document.getElementById('cartItemsList');
+            const totalDisplay = document.getElementById('cartTotalDisplay');
+            list.innerHTML = '';
+
+            if (carrito.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #888888;">Tu carrito está vacío.</p>';
+                totalDisplay.textContent = '$0.00';
+                return;
+            }
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+
+                const listItem = document.createElement('li');
+                listItem.className = 'cart-item';
+                listItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <img src="${item.imageURL}" alt="${item.name}">
+                        <div>
+                            <h4>${item.name}</h4>
+                            <p>$${item.price.toFixed(2)} c/u</p>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="changeQuantity('${item.id}', -1)">-</button>
+                        <input type="number" value="${item.quantity}" min="1" onchange="changeQuantity('${item.id}', this.value - ${item.quantity})" readonly>
+                        <button onclick="changeQuantity('${item.id}', 1)">+</button>
+                        <div style="width: 80px; text-align: right;">$${subtotal.toFixed(2)}</div>
+                        <button style="background: none; border: none; color: #ff4d4d; margin-top: 0; padding: 5px; width: auto;" onclick="removeItem('${item.id}')">X</button>
+                    </div>
+                `;
+                list.appendChild(listItem);
+            });
+
+            totalDisplay.textContent = `$${total.toFixed(2)}`;
+            document.getElementById('checkoutTotal').textContent = total.toFixed(2);
+        }
+        function showCart() {
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('checkoutView').classList.remove('active');
+            document.getElementById('cartView').classList.add('active');
+            renderCart();
+            document.getElementById('cartMsg').style.display = 'none';
+        }
+
+        function showCheckout() {
+            if (carrito.length === 0) {
+                showMessage('cartMsg', 'Tu carrito está vacío. Añade productos para pagar.', true);
+                return;
+            }
+            document.getElementById('cartView').classList.remove('active');
+            document.getElementById('checkoutView').classList.add('active');
+            document.getElementById('checkoutMsg').style.display = 'none';
+        }
+        function handleCheckout(event) {
+            event.preventDefault();
+
+            const total = carrito.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+            const address = document.getElementById('shippingAddress').value.trim();
+            const city = document.getElementById('shippingCity').value.trim();
+            const phone = document.getElementById('shippingPhone').value.trim();
+
+            if (!address || !city || !phone) {
+                showMessage('checkoutMsg', 'Por favor, completa todos los campos de envío.', true);
+                return;
+            }
+
+            // ADICIÓN SUPERVISOR: Guardar el pedido antes de limpiar el carrito
+            const newOrder = {
+                id: Date.now(), // ID único para el pedido
+                date: new Date().toLocaleString('es-CO'),
+                user: usuarioActual,
+                total: parseFloat(total),
+                address: address,
+                city: city,
+                phone: phone,
+                items: carrito.map(item => ({
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
+            };
+
+            pedidosCompletados.push(newOrder);
+            localStorage.setItem('pedidosCompletados', JSON.stringify(pedidosCompletados));
+            // FIN ADICIÓN SUPERVISOR
+
+            // Simulación de limpieza y regreso
+            carrito = [];
+            localStorage.removeItem('carrito');
+
+            // Mensaje de éxito
+            showMessage('checkoutMsg', `¡Pedido Confirmado por $${total}! Procesaremos tu envío a ${address}, ${city}. Revisa tu WhatsApp para el seguimiento. Transferencia al ${NEQUI_NUMBER}.`, false);
+
+
+            setTimeout(() => {
+                if (usuarioActual) {
+                    showDashboard(usuarioActual);
+                    document.getElementById('shippingAddress').value = '';
+                    document.getElementById('shippingCity').value = '';
+                    document.getElementById('shippingPhone').value = '';
+                } else {
+                    // Si el usuario cerró sesión en medio del checkout
+                    document.getElementById('authSection').style.display = 'flex';
+                    document.getElementById('checkoutView').classList.remove('active');
+                    switchForm('login');
+                }
+            }, 3000); 
+        }
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Revisa si hay un usuario logueado (simulación simple)
+            // No lo hacemos automáticamente por seguridad, mantenemos en la vista de login.
+            updateCartCount(); 
+
+            // Renderizar los productos iniciales si el dashboard estuviera activo por defecto,
+            // pero como empieza en login, se llama al iniciar sesión.
+        });
+    </script>
+</body>
+</html>
